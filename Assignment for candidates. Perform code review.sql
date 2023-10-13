@@ -3,6 +3,8 @@ create procedure syn.usp_ImportFileCustomerSeasonal
 as
 set nocount on
 begin
+	-- Inconsistent use of tabs and spaces for indentation
+	-- Unused variable @RowCount
 	declare @RowCount int = (select count(*) from syn.SA_CustomerSeasonal)
 	declare @ErrorMessage varchar(max)
 
@@ -19,7 +21,8 @@ begin
 			raiserror(@ErrorMessage, 3, 1)
 			return
 		end
-
+	-- Inconsistent use of uppercase and lowercase for SQL keywords
+	-- Unused temporary table #ProcessedRows
 	CREATE TABLE #ProcessedRows (
 		ActionType varchar(255),
 		ID int
@@ -29,10 +32,14 @@ begin
 		cc.ID as ID_dbo_Customer
 		,cst.ID as ID_CustomerSystemType
 		,s.ID as ID_Season
+		-- Missing whitespace around operators
 		,cast(cs.DateBegin as date) as DateBegin
 		,cast(cs.DateEnd as date) as DateEnd
+		-- Inconsistent capitalization in column names
 		,cd.ID as ID_dbo_CustomerDistributor
 		,cast(isnull(cs.FlagActive, 0) as bit) as FlagActive
+	-- Order of columns in INSERT INTO doesn't match the order in SELECT
+	-- SQL keywords not capitalized
 	into #CustomerSeasonal
 	from syn.SA_CustomerSeasonal cs
 		join dbo.Customer as cc on cc.UID_DS = cs.UID_DS_Customer
@@ -41,10 +48,12 @@ begin
 		join dbo.Customer as cd on cd.UID_DS = cs.UID_DS_CustomerDistributor
 			and cd.ID_mapping_DataSource = 1
 		join syn.CustomerSystemType as cst on cs.CustomerSystemType = cst.Name
+	-- Redundant conditions in WHERE clause
 	where try_cast(cs.DateBegin as date) is not null
+		SQL keywords not capitalized
 		and try_cast(cs.DateEnd as date) is not null
 		and try_cast(isnull(cs.FlagActive, 0) as bit) is not null
-
+	-- Incomplete comments without sufficient context
 	-- Определяем некорректные записи
 	-- Добавляем причину, по которой запись считается некорректной
 	select
@@ -60,10 +69,12 @@ begin
 		end as Reason
 	into #BadInsertedRows
 	from syn.SA_CustomerSeasonal as cs
+	-- Inconsistent naming convention for table and column names
 	left join dbo.Customer as cc on cc.UID_DS = cs.UID_DS_Customer
 		and cc.ID_mapping_DataSource = 1
 	left join dbo.Customer as cd on cd.UID_DS = cs.UID_DS_CustomerDistributor and cd.ID_mapping_DataSource = 1
 	left join dbo.Season as s on s.Name = cs.Season
+	-- Inconsistent use of aliases for columns and tables
 	left join syn.CustomerSystemType as cst on cst.Name = cs.CustomerSystemType
 	where cc.ID is null
 		or cd.ID is null
